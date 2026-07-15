@@ -144,6 +144,7 @@ class PushRelabel:
 
         n = self.n
         INF = 2 * n
+        previous_height = height.copy()
 
         for v in range(n):
             height[v] = INF
@@ -160,9 +161,11 @@ class PushRelabel:
                     height[e.to] = hv + 1
                     q.append(e.to)
 
+        # Preserve label progress outside the sink-reachable residual region.
+        # Resetting these vertices on every global relabel can repeat the same state.
         for v in range(n):
-            if height[v] == INF:
-                height[v] = n
+            if v != s and height[v] == INF:
+                height[v] = max(previous_height[v], n + 1)
 
         height[s] = n
 
